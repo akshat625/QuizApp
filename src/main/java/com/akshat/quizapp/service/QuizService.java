@@ -5,6 +5,7 @@ import com.akshat.quizapp.dao.QuizDao;
 import com.akshat.quizapp.model.Question;
 import com.akshat.quizapp.model.QuestionWrapper;
 import com.akshat.quizapp.model.Quiz;
+import com.akshat.quizapp.model.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,5 +53,22 @@ public class QuizService {
         return new ResponseEntity<>(new ArrayList<>(), HttpStatus.BAD_REQUEST);
 
 
+    }
+
+    public ResponseEntity<Integer> calculateResult(Integer id, List<Response> responses) {
+        try{
+            Optional<Quiz> quiz = quizDao.findById(id);
+            List<Question> questions = quiz.get().getQuestions();
+            int score = 0;
+            for(int i=0;i<questions.size();i++){
+                if(questions.get(i).getRight_answer().equals(responses.get(i).getMarkedAnswer()))
+                    score++;
+            }
+            return new ResponseEntity<>(score,HttpStatus.OK);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return new ResponseEntity<>(-1,HttpStatus.BAD_REQUEST);
     }
 }
